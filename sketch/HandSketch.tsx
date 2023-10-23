@@ -18,6 +18,8 @@ import Matter, { Body } from "matter-js";
 import * as Tone from "tone";
 import { drawFloor } from "../components/drawFloor";
 import { animationSequence02 } from "../components/animationSequence02";
+import { StaticTarget } from "../lib/StaticTargetClass";
+import { Effect } from "../lib/EffectClass";
 
 type Props = {
   handpose: MutableRefObject<Hand[]>;
@@ -31,7 +33,6 @@ export const HandSketch = ({ handpose }: Props) => {
   const handposeHistory = new HandposeHistory();
   const displayHands = new DisplayHands();
   const gainRef = useRef<number>(1);
-  const floorVisibilityRef = useRef<boolean>(false);
   const floorWidth = window.innerWidth * 0.9;
   const floorOffset = (window.innerWidth - floorWidth) / 2;
   const posList: Keypoint[] = new Array(12).fill({ x: 0, y: 0 });
@@ -39,7 +40,14 @@ export const HandSketch = ({ handpose }: Props) => {
   const scene01FinishRef = useRef<boolean>(false);
   const scene02FinishRef = useRef<boolean>(false);
   const scene03FinishRef = useRef<boolean>(false);
-  let alpha = 0;
+  const floorVisibilityRef = useRef<boolean>(false);
+  const ballVisibilityRef = useRef<boolean>(false);
+  const targetVisibilityRef = useRef<boolean>(false);
+  const targets: StaticTarget[] = [];
+  const score = useRef<number>(0);
+  const effectList: Effect[] = [];
+  let floorAlpha = 0;
+  let ballAlpha = 0;
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
 
@@ -276,12 +284,19 @@ export const HandSketch = ({ handpose }: Props) => {
     }
 
     if (floorVisibilityRef.current) {
-      alpha = Math.min(alpha + 1, 255);
+      floorAlpha = Math.min(floorAlpha + 1, 255);
     } else {
-      alpha = Math.max(alpha - 1, 0);
+      floorAlpha = Math.max(floorAlpha - 1, 0);
     }
 
-    drawFloor(p5, posList, floorWidth, floorOffset, alpha);
+    if (ballVisibilityRef.current) {
+      // ballAlpha = 255;
+      ballAlpha = 255;
+    } else {
+      ballAlpha = Math.max(ballAlpha - 10, 0);
+    }
+
+    drawFloor(p5, posList, floorWidth, floorOffset, floorAlpha);
 
     for (let i = 0; i < 11; i++) {
       Matter.Body.setVertices(floors[i], [
@@ -306,10 +321,11 @@ export const HandSketch = ({ handpose }: Props) => {
       );
     }
 
-    if (balls.length == 0) {
+    if (ballVisibilityRef.current && balls.length == 0) {
       const newBall = new Ball({ x: window.innerWidth / 2, y: -1000 }, 80);
       balls.push(newBall);
       Composite.add(engine.world, newBall.body);
+      score.current = 0;
     }
 
     for (const ball of balls) {
@@ -320,8 +336,49 @@ export const HandSketch = ({ handpose }: Props) => {
         circle.position.x < -200
       ) {
         Composite.remove(engine.world, ball.body);
-        const target = balls.indexOf(ball);
-        balls.splice(target, 1);
+        const targetId = balls.indexOf(ball);
+        balls.splice(targetId, 1);
+      }
+    }
+
+    for (const target of targets) {
+      target.update(balls, score);
+      if (target.state == "hit") {
+        Matter.Body.scale(balls[0].body, 0.6, 0.6);
+        balls[0].setMultiply(0.6);
+        balls[0].updateScale(0.6);
+        Tone.loaded().then(() => {
+          player.start();
+        });
+        effectList.push(new Effect(target.position));
+        target.state = "dying";
+      }
+      if (target.state == "dead") {
+        const targetId = targets.indexOf(target);
+        targets.splice(targetId, 1);
+      }
+    }
+
+    for (const effect of effectList) {
+      effect.update();
+      effect.show(p5);
+      if (effect.state == "dead") {
+        const target = effectList.indexOf(effect);
+        effectList.splice(target, 1);
+      }
+    }
+
+    if (targetVisibilityRef.current && targets.length == 0) {
+      while (targets.length < 1) {
+        targets.push(
+          new StaticTarget({
+            position: {
+              x: window.innerWidth * (Math.random() * 0.8 + 0.1),
+              y: window.innerHeight * (Math.random() * 0.3 + 0.1),
+            },
+            size: 30,
+          })
+        );
       }
     }
 
@@ -329,8 +386,13 @@ export const HandSketch = ({ handpose }: Props) => {
 
     /* draw circle */
     for (const ball of balls) {
+      p5.push();
+      p5.noStroke();
+      p5.fill(255, ballAlpha);
       ball.show(p5);
+      p5.pop();
     }
+    for (const target of targets) target.show(p5);
 
     if (scene01FinishRef.current) {
       setTimeout(() => {
@@ -338,22 +400,29 @@ export const HandSketch = ({ handpose }: Props) => {
       }, 5000);
 
       setTimeout(() => {
+        ballVisibilityRef.current = true;
         Body.setStatic(balls[0].body, false);
       }, 15000);
 
       setTimeout(() => {
-        scene02FinishRef.current = true;
-      }, 20000);
+        targetVisibilityRef.current = true;
+      }, 30000);
       scene01FinishRef.current = false;
     }
 
-    if (scene02FinishRef.current) {
+    if (score.current >= 30) {
+      scene02FinishRef.current = true;
+      targetVisibilityRef.current = false;
+      ballVisibilityRef.current = false;
+      balls[0].updateScale(0.01);
       setTimeout(() => {
-        floorVisibilityRef.current = false;
         animationSequence02(leftFingers, scene03FinishRef);
         animationSequence02(rightFingers, scene03FinishRef);
-      }, 3000);
-      scene02FinishRef.current = false;
+      }, 1000);
+      setTimeout(() => {
+        floorVisibilityRef.current = false;
+      }, 1000);
+      score.current = 0;
     }
   };
 
