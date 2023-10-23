@@ -55,6 +55,10 @@ export default function App() {
           sketchContainerRef.current!.style.filter = "blur(10px)";
           titleRef.current!.style.opacity = "1";
         }
+
+        if (lostCountRef.current > 300) {
+          location.reload();
+        }
       }
     }
 

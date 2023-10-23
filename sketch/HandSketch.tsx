@@ -39,7 +39,7 @@ export const HandSketch = ({ handpose }: Props) => {
   const randomList = useRef<number[]>([4, 3, 2, 1, 0]);
   const scene01FinishRef = useRef<boolean>(false);
   const scene02FinishRef = useRef<boolean>(false);
-  const scene03FinishRef = useRef<boolean>(false);
+  const scene03FinishRef = useRef<boolean>(true);
   const floorVisibilityRef = useRef<boolean>(false);
   const ballVisibilityRef = useRef<boolean>(false);
   const targetVisibilityRef = useRef<boolean>(false);
@@ -47,7 +47,7 @@ export const HandSketch = ({ handpose }: Props) => {
   const score = useRef<number>(0);
   const effectList: Effect[] = [];
   let floorAlpha = 0;
-  let ballAlpha = 0;
+  let ballAlpha = 255;
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
 
@@ -73,8 +73,7 @@ export const HandSketch = ({ handpose }: Props) => {
         window.innerHeight - 50,
         floorWidth / 11,
         100,
-        //@ts-ignore
-        { chamfer: 0, isStatic: true }
+        { isStatic: true }
       )
     );
   }
@@ -182,9 +181,6 @@ export const HandSketch = ({ handpose }: Props) => {
   }
 
   const balls: Ball[] = [];
-  for (let i = 0; i < 1; i++) {
-    balls.push(new Ball({ x: window.innerWidth / 2, y: -1000 }, 80));
-  }
 
   // create an engine
   let engine: Matter.Engine;
@@ -204,7 +200,6 @@ export const HandSketch = ({ handpose }: Props) => {
       ...floors,
       // ...bucket,
     ]);
-    Body.setStatic(balls[0].body, true);
   };
 
   const draw = (p5: p5Types) => {
@@ -394,6 +389,13 @@ export const HandSketch = ({ handpose }: Props) => {
     }
     for (const target of targets) target.show(p5);
 
+    if (scene03FinishRef.current) {
+      // // Animation
+      animationSequence(leftFingers, scene01FinishRef);
+      animationSequence(rightFingers, scene01FinishRef);
+      scene03FinishRef.current = false;
+    }
+
     if (scene01FinishRef.current) {
       setTimeout(() => {
         floorVisibilityRef.current = true;
@@ -401,7 +403,6 @@ export const HandSketch = ({ handpose }: Props) => {
 
       setTimeout(() => {
         ballVisibilityRef.current = true;
-        Body.setStatic(balls[0].body, false);
       }, 15000);
 
       setTimeout(() => {
@@ -414,10 +415,14 @@ export const HandSketch = ({ handpose }: Props) => {
       scene02FinishRef.current = true;
       targetVisibilityRef.current = false;
       ballVisibilityRef.current = false;
-      balls[0].updateScale(0.01);
+      balls[0].updateScale(0.1);
       setTimeout(() => {
         animationSequence02(leftFingers, scene03FinishRef);
         animationSequence02(rightFingers, scene03FinishRef);
+        if (balls.length > 0) {
+          Composite.remove(engine.world, balls[0].body);
+          balls.splice(0, 1);
+        }
       }, 1000);
       setTimeout(() => {
         floorVisibilityRef.current = false;
@@ -425,10 +430,6 @@ export const HandSketch = ({ handpose }: Props) => {
       score.current = 0;
     }
   };
-
-  // // Animation
-  animationSequence(leftFingers, scene01FinishRef);
-  animationSequence(rightFingers, scene01FinishRef);
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);

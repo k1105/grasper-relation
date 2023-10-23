@@ -32,9 +32,9 @@ export const Monitor = ({ handpose, debugLog, gain }: Props) => {
   const sliderRef = useRef<HTMLInputElement>(null);
 
   const [visibility, setVisibility] = useState<boolean>(false);
-  const [helperVisibility, setHelperVisibility] = useState<boolean>(true);
+  const [helperVisibility, setHelperVisibility] = useState<boolean>(false);
   const visibilityRef = useRef<boolean>(false);
-  const helperVisibilityRef = useRef<boolean>(true);
+  const helperVisibilityRef = useRef<boolean>(false);
   visibilityRef.current = visibility;
   helperVisibilityRef.current = helperVisibility;
 
