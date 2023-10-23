@@ -1,33 +1,33 @@
 import { MutableRefObject } from "react";
 import { Group } from "../lib/GroupClass";
 
-export const animationSequence = (
+export const animationSequence02 = (
   fingers: Group[],
   finishRef: MutableRefObject<boolean>
 ) => {
-  const timeList: number[] = [10, 15, 16, 17];
+  const timeList: number[] = [5, 6, 7, 12];
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.moveTo(1);
+      finger.activate(4 * finger.id + 2);
     }
   }, timeList[0] * 1000);
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.deactivate(0);
+      finger.activate(4 * finger.id + 3);
     }
   }, timeList[1] * 1000);
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.deactivate(4 * finger.id + 2);
+      finger.activate(0);
     }
   }, timeList[2] * 1000);
 
   setTimeout(() => {
     for (const finger of fingers) {
-      finger.deactivate(4 * finger.id + 3);
+      finger.moveTo(0);
     }
   }, timeList[3] * 1000);
 

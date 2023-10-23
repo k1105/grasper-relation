@@ -17,6 +17,7 @@ import { Keypoint } from "@tensorflow-models/hand-pose-detection";
 import Matter, { Body } from "matter-js";
 import * as Tone from "tone";
 import { drawFloor } from "../components/drawFloor";
+import { animationSequence02 } from "../components/animationSequence02";
 
 type Props = {
   handpose: MutableRefObject<Hand[]>;
@@ -35,6 +36,9 @@ export const HandSketch = ({ handpose }: Props) => {
   const floorOffset = (window.innerWidth - floorWidth) / 2;
   const posList: Keypoint[] = new Array(12).fill({ x: 0, y: 0 });
   const randomList = useRef<number[]>([4, 3, 2, 1, 0]);
+  const scene01FinishRef = useRef<boolean>(false);
+  const scene02FinishRef = useRef<boolean>(false);
+  const scene03FinishRef = useRef<boolean>(false);
   let alpha = 0;
 
   const debugLog = useRef<{ label: string; value: any }[]>([]);
@@ -273,6 +277,8 @@ export const HandSketch = ({ handpose }: Props) => {
 
     if (floorVisibilityRef.current) {
       alpha = Math.min(alpha + 1, 255);
+    } else {
+      alpha = Math.max(alpha - 1, 0);
     }
 
     drawFloor(p5, posList, floorWidth, floorOffset, alpha);
@@ -325,23 +331,39 @@ export const HandSketch = ({ handpose }: Props) => {
     for (const ball of balls) {
       ball.show(p5);
     }
+
+    if (scene01FinishRef.current) {
+      setTimeout(() => {
+        floorVisibilityRef.current = true;
+      }, 5000);
+
+      setTimeout(() => {
+        Body.setStatic(balls[0].body, false);
+      }, 15000);
+
+      setTimeout(() => {
+        scene02FinishRef.current = true;
+      }, 20000);
+      scene01FinishRef.current = false;
+    }
+
+    if (scene02FinishRef.current) {
+      setTimeout(() => {
+        floorVisibilityRef.current = false;
+        animationSequence02(leftFingers, scene03FinishRef);
+        animationSequence02(rightFingers, scene03FinishRef);
+      }, 3000);
+      scene02FinishRef.current = false;
+    }
   };
 
   // // Animation
-  animationSequence(leftFingers);
-  animationSequence(rightFingers);
+  animationSequence(leftFingers, scene01FinishRef);
+  animationSequence(rightFingers, scene01FinishRef);
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
   };
-
-  setTimeout(() => {
-    floorVisibilityRef.current = true;
-  }, 5000 * 5);
-
-  setTimeout(() => {
-    Body.setStatic(balls[0].body, false);
-  }, 5000 * 6);
 
   return (
     <>
