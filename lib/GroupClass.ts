@@ -2,8 +2,9 @@ import { Keypoint } from "@tensorflow-models/hand-pose-detection";
 import { Point } from "./PointClass";
 import p5Types from "p5";
 import { Handpose } from "../@types/global";
-import { quadraticInOut } from "./calculator/quadraticInOut";
-import { spring } from "./calculator/spring";
+import { interpolatedPosition } from "./interpolatedPosition";
+
+type Animation = "spring" | "quagratic";
 
 export class Group {
   id: number;
@@ -12,6 +13,7 @@ export class Group {
     state: "switching" | null;
     progress: number;
     targetId: number | null;
+    animation: Animation;
   };
   points: Point[];
   displayPositions: { id: number; pos: Keypoint; radius: number }[];
@@ -29,7 +31,12 @@ export class Group {
     this.changeLog = [];
     this.positionSequence = [];
     this.position = position;
-    this.morphing = { state: null, progress: 0, targetId: null }; //targetId: switchの時のみ使用
+    this.morphing = {
+      state: null,
+      progress: 0,
+      targetId: null,
+      animation: "quagratic",
+    }; //targetId: switchの時のみ使用
   }
 
   setPositionSequence(
@@ -39,7 +46,12 @@ export class Group {
   }
 
   moveTo(id: number) {
-    this.morphing = { state: "switching", progress: 0, targetId: id };
+    this.morphing = {
+      state: "switching",
+      progress: 0,
+      targetId: id,
+      animation: "quagratic",
+    };
   }
 
   getNeighbors(id: number) {
@@ -68,17 +80,22 @@ export class Group {
     return { prevId: prevId, nextId: nextId };
   }
 
-  switch(prev: number, next: number) {
+  switch(prev: number, next: number, animation: Animation = "quagratic") {
     //prev, next == id
     const prevPoint = this.find(prev);
     const nextPoint = this.find(next);
     if (prevPoint!.isActive && !nextPoint!.isActive) {
       //code here
-      prevPoint!.morphing = { state: "switch", progress: 0, targetId: next };
+      prevPoint!.morphing = {
+        state: "switch",
+        progress: 0,
+        targetId: next,
+        animation,
+      };
     }
   }
 
-  deactivate(id: number) {
+  deactivate(id: number, animation: Animation = "quagratic") {
     const targetPoint = this.find(id);
     if (targetPoint && targetPoint.isActive) {
       const neighbors = this.getNeighbors(id);
@@ -87,16 +104,22 @@ export class Group {
         state: "deactivate",
         progress: 0,
         targetId: null,
+        animation,
       };
     }
   }
 
-  activate(id: number) {
+  activate(id: number, animation: Animation = "quagratic") {
     const targetPoint = this.find(id);
     if (targetPoint && !targetPoint.isActive) {
       const neighbor = this.getNeighbors(id);
       targetPoint.setNeighbors(neighbor);
-      targetPoint.morphing = { state: "activate", progress: 0, targetId: null };
+      targetPoint.morphing = {
+        state: "activate",
+        progress: 0,
+        targetId: null,
+        animation,
+      };
     }
   }
 
@@ -114,14 +137,21 @@ export class Group {
         this.id
       );
       const t = this.morphing.progress;
-      this.position = {
-        x: quadraticInOut(currentPosition.x, targetPosition.x, t),
-        y: quadraticInOut(currentPosition.y, targetPosition.y, t),
-      };
+      this.position = interpolatedPosition(
+        t,
+        currentPosition,
+        targetPosition,
+        this.morphing.animation
+      );
       this.morphing.progress += 0.02;
       if (this.morphing.progress > 1) {
         this.currentSequenceId = this.morphing.targetId as number;
-        this.morphing = { state: null, progress: 0, targetId: null };
+        this.morphing = {
+          state: null,
+          progress: 0,
+          targetId: null,
+          animation: "quagratic",
+        };
       }
     } else {
       this.position = this.positionSequence[this.currentSequenceId](
@@ -172,28 +202,34 @@ export class Group {
         if (point.morphing.state == "deactivate") {
           this.displayPositions.push({
             id: point.id,
-            pos: {
-              x: spring(point.pos.x, targetPosition.x, t),
-              y: spring(point.pos.y, targetPosition.y, t),
-            },
+            pos: interpolatedPosition(
+              t,
+              point.pos,
+              targetPosition,
+              point.morphing.animation
+            ),
             radius: 10 * (1 - t),
           });
         } else if (point.morphing.state == "switch") {
           this.displayPositions.push({
             id: point.id,
-            pos: {
-              x: spring(point.pos.x, targetPosition.x, t),
-              y: spring(point.pos.y, targetPosition.y, t),
-            },
+            pos: interpolatedPosition(
+              t,
+              point.pos,
+              targetPosition,
+              point.morphing.animation
+            ),
             radius: 10,
           });
         } else {
           this.displayPositions.push({
             id: point.id,
-            pos: {
-              x: quadraticInOut(targetPosition.x, point.pos.x, t),
-              y: quadraticInOut(targetPosition.y, point.pos.y, t),
-            },
+            pos: interpolatedPosition(
+              t,
+              targetPosition,
+              point.pos,
+              point.morphing.animation
+            ),
             radius: 10 * t,
           });
         }

@@ -2,6 +2,8 @@ import { Keypoint } from "@tensorflow-models/hand-pose-detection";
 import { Handpose } from "../@types/global";
 // import { Node } from "./NodeClass";
 
+type Animation = "spring" | "quagratic";
+
 export class Point {
   id: number;
   pos: Keypoint;
@@ -14,6 +16,7 @@ export class Point {
     state: "switch" | "activate" | "deactivate" | null;
     progress: number;
     targetId: number | null;
+    animation: Animation;
   };
   constructor(
     id: number,
@@ -29,7 +32,12 @@ export class Point {
     this.centerPoint = centerPoint;
     this.isActive = isActive;
     this.neighbors = { prevId: id, nextId: id };
-    this.morphing = { state: null, progress: 0, targetId: null }; //targetId: switchの時のみ使用
+    this.morphing = {
+      state: null,
+      progress: 0,
+      targetId: null,
+      animation: "quagratic",
+    }; //targetId: switchの時のみ使用
   }
   setPosRule(rule: (handpose: Handpose, centerPoint: number) => Keypoint) {
     this.posRule = rule;
