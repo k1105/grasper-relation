@@ -176,9 +176,9 @@ export class Group {
             point.neighbors.prevId == null
           ) {
             //null判定
-            console.log("next: " + point.neighbors.nextId);
-            console.log("prev: " + point.neighbors.prevId);
-            console.log(this.points);
+            // console.log("next: " + point.neighbors.nextId);
+            // console.log("prev: " + point.neighbors.prevId);
+            // console.log(this.points);
             if (point.neighbors.nextId) {
               //nextで消える / nextから生じる
               targetPosition = this.find(point.neighbors.nextId)!.pos;

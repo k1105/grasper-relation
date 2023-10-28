@@ -74,7 +74,7 @@ export const HandSketch = ({ handpose }: Props) => {
         window.innerHeight - 50,
         floorWidth / 11,
         100,
-        { isStatic: true }
+        { restitution: 0.3, isStatic: true }
       )
     );
   }
@@ -314,7 +314,10 @@ export const HandSketch = ({ handpose }: Props) => {
     }
 
     if (ballVisibilityRef.current && balls.length == 0) {
+      //@ts-ignore
       const newBall = new Ball({ x: window.innerWidth / 2, y: -1000 }, 80);
+      Matter.Body.setDensity(newBall.body, 1);
+      newBall.body.restitution = 0.15;
       balls.push(newBall);
       Composite.add(engine.world, newBall.body);
       score.current = 0;
