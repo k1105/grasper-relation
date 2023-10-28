@@ -20,6 +20,7 @@ export default function App() {
   const requestRef = useRef<null | number>(null);
   const [ready, setReady] = useState<boolean>(false);
   const lostCountRef = useRef(0);
+  const lostAt = useRef(0);
   const sketchContainerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +43,7 @@ export default function App() {
           predictionsRef.current = predictions;
           lostCountRef.current = 0;
           titleRef.current!.style.opacity = "0";
+          lostAt.current = Date.now();
           sketchContainerRef.current!.style.filter = "blur(0px)";
         } else {
           lostCountRef.current++;
@@ -56,7 +58,10 @@ export default function App() {
           titleRef.current!.style.opacity = "1";
         }
 
-        if (lostCountRef.current > 300) {
+        if (
+          lostAt.current !== 0 &&
+          Date.now() - lostAt.current > 2 * 60 * 1000
+        ) {
           location.reload();
         }
       }
@@ -70,6 +75,7 @@ export default function App() {
   useEffect(() => {
     const load = async () => {
       const model = handPoseDetection.SupportedModels.MediaPipeHands;
+      lostAt.current = Date.now();
       const detectorConfig = {
         runtime: "tfjs",
         modelType: "full",
