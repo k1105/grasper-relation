@@ -14,12 +14,13 @@ import { Group } from "../lib/GroupClass";
 import { Ball } from "../lib/BallClass";
 import { animationSequence } from "../components/animationSequence";
 import { Keypoint } from "@tensorflow-models/hand-pose-detection";
-import Matter, { Body } from "matter-js";
+import Matter from "matter-js";
 import * as Tone from "tone";
 import { drawFloor } from "../components/drawFloor";
 import { animationSequence02 } from "../components/animationSequence02";
 import { StaticTarget } from "../lib/StaticTargetClass";
 import { Effect } from "../lib/EffectClass";
+import { resizeHandpose } from "../lib/converter/resizeHandpose";
 
 type Props = {
   handpose: MutableRefObject<Hand[]>;
@@ -32,7 +33,7 @@ const Sketch = dynamic(import("react-p5"), {
 export const HandSketch = ({ handpose }: Props) => {
   const handposeHistory = new HandposeHistory();
   const displayHands = new DisplayHands();
-  const gainRef = useRef<number>(1);
+  const gainRef = useRef<number>(2);
   const floorWidth = window.innerWidth * 0.9;
   const floorOffset = (window.innerWidth - floorWidth) / 2;
   const posList: Keypoint[] = new Array(12).fill({ x: 0, y: 0 });
@@ -208,10 +209,14 @@ export const HandSketch = ({ handpose }: Props) => {
       right: Handpose;
     } = convertHandToHandpose(handpose.current);
     handposeHistory.update(rawHands);
-    const hands: {
+    let hands: {
       left: Handpose;
       right: Handpose;
     } = getSmoothedHandpose(rawHands, handposeHistory); //平滑化された手指の動きを取得する
+    hands = {
+      left: resizeHandpose(hands.left, gainRef.current),
+      right: resizeHandpose(hands.right, gainRef.current),
+    };
 
     // logとしてmonitorに表示する
     debugLog.current = [];
@@ -255,12 +260,8 @@ export const HandSketch = ({ handpose }: Props) => {
       for (let i = 0; i < 5; i++) {
         const j = randomList.current[i];
         posList[i + 1] = {
-          x:
-            (hands.left[4 * j + 4].x - hands.left[4 * j + 1].x) *
-            gainRef.current,
-          y:
-            (hands.left[4 * j + 4].y - hands.left[4 * j + 1].y) *
-            gainRef.current,
+          x: hands.left[4 * j + 4].x - hands.left[4 * j + 1].x,
+          y: hands.left[4 * j + 4].y - hands.left[4 * j + 1].y,
         };
       }
     }
@@ -268,12 +269,8 @@ export const HandSketch = ({ handpose }: Props) => {
       for (let i = 0; i < 5; i++) {
         const j = randomList.current[i];
         posList[10 - i] = {
-          x:
-            (hands.right[4 * j + 4].x - hands.right[4 * j + 1].x) *
-            gainRef.current,
-          y:
-            (hands.right[4 * j + 4].y - hands.right[4 * j + 1].y) *
-            gainRef.current,
+          x: hands.right[4 * j + 4].x - hands.right[4 * j + 1].x,
+          y: hands.right[4 * j + 4].y - hands.right[4 * j + 1].y,
         };
       }
     }
