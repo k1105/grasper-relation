@@ -7,6 +7,7 @@ import { PixelInput } from "@tensorflow-models/hand-pose-detection/dist/shared/c
 import Head from "next/head";
 import { Cormorant_Garamond } from "next/font/google";
 import { calcKeypointsTotalDistance } from "../lib/calculator/calcKeypointsTotalDistance";
+import { isTotalDistanceGreater } from "../lib/calculator/isTotalDistanceGreater";
 
 // If loading a variable font, you don't need to specify the font weight
 const garamond400 = Cormorant_Garamond({
@@ -40,8 +41,7 @@ export default function App() {
           predictions.length > 0 &&
           predictions.every((hand) => {
             return (
-              hand.score > 0.75 &&
-              calcKeypointsTotalDistance(hand.keypoints) > 260 // カメラから離れた場合にロスト判定する。
+              hand.score > 0.75 && isTotalDistanceGreater(hand.keypoints, 260) // カメラから離れた場合にロスト判定する。
               //閾値はチューニング用のサイト(https://grasper-threshold-checker.vercel.app/)で計測（23/10/29時点での設営）したものを使用。
             );
           })
