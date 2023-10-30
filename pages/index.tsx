@@ -74,7 +74,7 @@ export default function App() {
               location.reload();
             }
           } else {
-            if (Date.now() - lostAt.current > 20 * 1000) {
+            if (Date.now() - lostAt.current > 10 * 1000) {
               location.reload();
             }
           }
