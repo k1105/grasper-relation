@@ -70,7 +70,7 @@ export default function App() {
 
         if (lostAt.current !== 0) {
           if (noUser.current) {
-            if (Date.now() - lostAt.current > 2 * 60 * 1000) {
+            if (Date.now() - lostAt.current > 10 * 60 * 1000) {
               location.reload();
             }
           } else {
