@@ -8,6 +8,7 @@ import Head from "next/head";
 import { Cormorant_Garamond } from "next/font/google";
 import { calcKeypointsTotalDistance } from "../lib/calculator/calcKeypointsTotalDistance";
 import { isTotalDistanceGreater } from "../lib/calculator/isTotalDistanceGreater";
+import Image from "next/image";
 
 // If loading a variable font, you don't need to specify the font weight
 const garamond400 = Cormorant_Garamond({
@@ -25,7 +26,8 @@ export default function App() {
   const lostAt = useRef(0);
   const isLost = useRef<boolean>(true);
   const sketchContainerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
+  // const titleRef = useRef<HTMLDivElement>(null);
+  const instructionRef = useRef<HTMLDivElement>(null);
   const noUser = useRef<boolean>(true);
 
   // const timer = 120000;
@@ -49,7 +51,8 @@ export default function App() {
         ) {
           predictionsRef.current = predictions;
           lostCountRef.current = 0;
-          titleRef.current!.style.opacity = "0";
+          instructionRef.current!.style.opacity = "0";
+          // titleRef.current!.style.opacity = "0";
           lostAt.current = Date.now();
           isLost.current = false;
           sketchContainerRef.current!.style.filter = "blur(0px)";
@@ -65,7 +68,8 @@ export default function App() {
 
         if (lostCountRef.current > 100) {
           sketchContainerRef.current!.style.filter = "blur(10px)";
-          titleRef.current!.style.opacity = "1";
+          instructionRef.current!.style.opacity = "1";
+          // titleRef.current!.style.opacity = "1";
         }
 
         if (lostAt.current !== 0) {
@@ -121,7 +125,7 @@ export default function App() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div
+      {/* <div
         ref={titleRef}
         className={garamond400.className}
         style={{
@@ -136,6 +140,27 @@ export default function App() {
         }}
       >
         Relation
+      </div> */}
+
+      <div
+        ref={instructionRef}
+        style={{
+          position: "absolute",
+          top: "0",
+          width: "100vw",
+          lineHeight: "100vh",
+          textAlign: "center",
+          transition: "all 1s ease",
+          opacity: "1",
+        }}
+      >
+        <Image
+          src="/img/instruction.png"
+          width={800}
+          height={800}
+          style={{ marginTop: "100px" }}
+          alt="手前の台に手を近づけると、体験が始まります。"
+        ></Image>
       </div>
 
       {ready && (
