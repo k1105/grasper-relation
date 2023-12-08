@@ -404,11 +404,11 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
 
       setTimeout(() => {
         ballVisibilityRef.current = true;
-      }, 25000);
+      }, 10000);
 
       setTimeout(() => {
         targetVisibilityRef.current = true;
-      }, 60000);
+      }, 20000);
       scene01FinishRef.current = false;
     }
 
