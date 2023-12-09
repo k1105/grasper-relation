@@ -7,7 +7,7 @@ import { PixelInput } from "@tensorflow-models/hand-pose-detection/dist/shared/c
 import Head from "next/head";
 import { Cormorant_Garamond } from "next/font/google";
 import { calcKeypointsTotalDistance } from "../lib/calculator/calcKeypointsTotalDistance";
-import { isTotalDistanceGreater } from "../lib/calculator/isTotalDistanceGreater";
+import { totalDistanceCalculator } from "../lib/calculator/totalDistanceCalculator";
 import Image from "next/image";
 
 // If loading a variable font, you don't need to specify the font weight
@@ -28,6 +28,7 @@ export default function App() {
   const sketchContainerRef = useRef<HTMLDivElement>(null);
   // const titleRef = useRef<HTMLDivElement>(null);
   const instructionRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<HTMLDivElement>(null);
   const noUser = useRef<boolean>(true);
 
   // const timer = 120000;
@@ -43,10 +44,20 @@ export default function App() {
         if (
           predictions.length > 0 &&
           predictions.every((hand) => {
-            return (
-              hand.score > 0.75 && isTotalDistanceGreater(hand.keypoints, 260) // カメラから離れた場合にロスト判定する。
-              //閾値はチューニング用のサイト(https://grasper-threshold-checker.vercel.app/)で計測（23/10/29時点での設営）したものを使用。
-            );
+            const res = totalDistanceCalculator(hand.keypoints);
+            const lower = 260;
+            const upper = 1500;
+            // カメラから離れた場合にロスト判定する。
+            //閾値はチューニング用のサイト(https://grasper-threshold-checker.vercel.app/)で計測（23/10/29時点での設営）したものを使用。
+            let status = false;
+            if (lower < res && res < upper) {
+              status = true;
+              messageRef.current!.style.opacity = "0";
+            } else if (upper < res) {
+              messageRef.current!.style.opacity = "1";
+              sketchContainerRef.current!.style.filter = "blur(10px)";
+            }
+            return hand.score > 0.75 && status;
           })
         ) {
           predictionsRef.current = predictions;
@@ -160,6 +171,26 @@ export default function App() {
           height={800}
           style={{ marginTop: "100px" }}
           alt="手前の台に手を近づけると、体験が始まります。"
+        ></Image>
+      </div>
+      <div
+        ref={messageRef}
+        style={{
+          position: "absolute",
+          top: "0",
+          width: "100vw",
+          lineHeight: "100vh",
+          textAlign: "center",
+          transition: "all 1s ease",
+          opacity: "0",
+        }}
+      >
+        <Image
+          src="/img/caution_close.png"
+          width={800}
+          height={800}
+          style={{ marginTop: "100px" }}
+          alt="手が近すぎます。"
         ></Image>
       </div>
 
