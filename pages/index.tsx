@@ -7,7 +7,6 @@ import { PixelInput } from "@tensorflow-models/hand-pose-detection/dist/shared/c
 import Head from "next/head";
 import { Cormorant_Garamond } from "next/font/google";
 import { calcKeypointsTotalDistance } from "../lib/calculator/calcKeypointsTotalDistance";
-import { totalDistanceCalculator } from "../lib/calculator/totalDistanceCalculator";
 import Image from "next/image";
 
 // If loading a variable font, you don't need to specify the font weight
@@ -44,7 +43,7 @@ export default function App() {
         if (
           predictions.length > 0 &&
           predictions.every((hand) => {
-            const res = totalDistanceCalculator(hand.keypoints);
+            const res = calcKeypointsTotalDistance(hand.keypoints);
             const lower = 260;
             const upper = 1200;
             // カメラから離れた場合にロスト判定する。
