@@ -46,7 +46,7 @@ export default function App() {
           predictions.every((hand) => {
             const res = totalDistanceCalculator(hand.keypoints);
             const lower = 260;
-            const upper = 1500;
+            const upper = 1200;
             // カメラから離れた場合にロスト判定する。
             //閾値はチューニング用のサイト(https://grasper-threshold-checker.vercel.app/)で計測（23/10/29時点での設営）したものを使用。
             let status = false;
