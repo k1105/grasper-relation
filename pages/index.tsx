@@ -29,6 +29,8 @@ export default function App() {
   const instructionRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const noUser = useRef<boolean>(true);
+  const [innerWidth, setInnerWidth] = useState<number>(0);
+  const [innerHeight, setInnerHeight] = useState<number>(0);
 
   // const timer = 120000;
 
@@ -119,6 +121,8 @@ export default function App() {
 
     setReady(true);
     // setInterval("location.reload()", timer);
+    setInnerWidth(window.innerWidth);
+    setInnerHeight(window.innerHeight);
   }, []);
 
   useEffect(() => {
@@ -171,6 +175,24 @@ export default function App() {
           style={{ marginTop: "100px" }}
           alt="手前の台に手を近づけると、体験が始まります。"
         ></Image>
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: -innerWidth / 4,
+            zIndex: -1,
+            opacity: 0.5,
+          }}
+        >
+          <Webcam //手指の動きを取得するのに必要なカメラ映像
+            width={innerWidth}
+            height={innerWidth}
+            mirrored
+            id="webcam"
+            audio={false}
+            screenshotFormat="image/jpeg"
+          />
+        </div>
       </div>
       <div
         ref={messageRef}
