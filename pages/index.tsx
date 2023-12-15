@@ -181,7 +181,7 @@ export default function App() {
             right: 0,
             top: -innerWidth / 4,
             zIndex: -1,
-            opacity: 0.5,
+            opacity: 0.3,
           }}
         >
           <Webcam //手指の動きを取得するのに必要なカメラ映像
