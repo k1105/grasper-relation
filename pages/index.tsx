@@ -121,7 +121,7 @@ export default function App() {
       if (noUser.current && typeof window !== "undefined") {
         location.reload();
       }
-    }, 10 * 60 * 1000);
+    }, 10 * 60 * 1000); //ページリロードの周期
 
     setReady(true);
     setInnerWidth(window.innerWidth);
