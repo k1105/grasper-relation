@@ -32,7 +32,7 @@ export default function App() {
   const [innerWidth, setInnerWidth] = useState<number>(0);
   const [innerHeight, setInnerHeight] = useState<number>(0);
 
-  // const timer = 120000;
+  const timer = 10 * 60 * 1000;
 
   const capture = useCallback(async () => {
     if (typeof webcamRef.current && modelRef.current) {
@@ -119,8 +119,13 @@ export default function App() {
 
     load();
 
+    setInterval(() => {
+      if (noUser.current && typeof window !== "undefined") {
+        location.reload();
+      }
+    }, timer);
+
     setReady(true);
-    // setInterval("location.reload()", timer);
     setInnerWidth(window.innerWidth);
     setInnerHeight(window.innerHeight);
   }, []);
