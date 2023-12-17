@@ -1,7 +1,6 @@
 import Webcam from "react-webcam";
 import Image from "next/image";
-import { MutableRefObject, useEffect, useState } from "react";
-import { type } from "os";
+import { MutableRefObject, useState } from "react";
 
 type Props = {
   noUser: MutableRefObject<boolean>;
