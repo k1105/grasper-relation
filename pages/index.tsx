@@ -32,8 +32,6 @@ export default function App() {
   const [innerWidth, setInnerWidth] = useState<number>(0);
   const [innerHeight, setInnerHeight] = useState<number>(0);
 
-  const timer = 10 * 60 * 1000;
-
   const capture = useCallback(async () => {
     if (typeof webcamRef.current && modelRef.current) {
       //webcamとmodelのインスタンスが生成されていたら
@@ -123,7 +121,7 @@ export default function App() {
       if (noUser.current && typeof window !== "undefined") {
         location.reload();
       }
-    }, timer);
+    }, 10 * 60 * 1000);
 
     setReady(true);
     setInnerWidth(window.innerWidth);
