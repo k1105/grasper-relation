@@ -32,15 +32,24 @@ export const ScreenSaver = ({ noUser }: Props) => {
       >
         Familiar / Strange
       </div> */}
-      <Image
-        src="/img/instruction.png"
-        width={800}
-        height={800}
-        style={{ marginTop: "100px" }}
-        alt="手前の台に手を近づけると、体験が始まります。"
-      ></Image>
-
       <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          src="/img/instruction.png"
+          width={800}
+          height={800}
+          alt="手前の台に手を近づけると、体験が始まります。"
+        ></Image>
+      </div>
+
+      {/* <div
         style={{
           position: "absolute",
           right: 0,
@@ -73,7 +82,7 @@ export const ScreenSaver = ({ noUser }: Props) => {
             }}
           />
         )}
-      </div>
+      </div> */}
     </>
   );
 };
