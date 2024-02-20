@@ -67,7 +67,7 @@ export const Monitor = ({ handpose, debugLog, gain }: Props) => {
     p5.stroke(220);
     p5.fill(255);
     p5.strokeWeight(10);
-    sliderRef.current!.value = "20";
+    sliderRef.current!.value = "15";
   };
 
   const draw = (p5: p5Types) => {

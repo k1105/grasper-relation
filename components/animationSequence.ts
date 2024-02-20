@@ -5,7 +5,7 @@ export const animationSequence = (
   fingers: Group[],
   finishRef: MutableRefObject<boolean>
 ) => {
-  const timeList: number[] = [10, 15, 16, 17];
+  const timeList: number[] = [5, 10, 11, 12];
 
   setTimeout(() => {
     for (const finger of fingers) {

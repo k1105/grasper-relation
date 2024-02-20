@@ -34,7 +34,7 @@ const Sketch = dynamic(import("react-p5"), {
 export const HandSketch = ({ handpose, isLost }: Props) => {
   const handposeHistory = new HandposeHistory();
   const displayHands = new DisplayHands();
-  const gainRef = useRef<number>(2);
+  const gainRef = useRef<number>(15);
   const floorWidth = window.innerWidth * 0.9;
   const floorOffset = (window.innerWidth - floorWidth) / 2;
   const posList: Keypoint[] = new Array(12).fill({ x: 0, y: 0 });
