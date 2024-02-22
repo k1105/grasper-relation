@@ -27,7 +27,7 @@ export const drawFloor = (
       );
 
       p5.push();
-      p5.fill(220, alpha);
+      p5.fill(200, alpha);
       //p5.noStroke();
       p5.translate(
         (posList[i].x + posList[i + 1].x + floorWidth / 11) / 2 +

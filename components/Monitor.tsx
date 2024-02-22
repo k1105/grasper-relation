@@ -64,7 +64,7 @@ export const Monitor = ({ handpose, debugLog, gain }: Props) => {
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(p5.windowWidth, p5.windowHeight).parent(canvasParentRef);
-    p5.stroke(220);
+    p5.stroke(200);
     p5.fill(255);
     p5.strokeWeight(10);
     sliderRef.current!.value = "15";

@@ -16,7 +16,7 @@ body,
   -ms-user-select: none;
   user-select: none;
   overflow: hidden;
-  background: #011960;
+  background: #999;
 }
 
 #root {

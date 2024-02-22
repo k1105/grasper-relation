@@ -193,8 +193,8 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(p5.windowWidth, p5.windowHeight).parent(canvasParentRef);
-    p5.stroke(220);
-    p5.fill(220);
+    p5.stroke(200);
+    p5.fill(200);
     p5.strokeWeight(1);
     engine = Engine.create();
     Composite.add(engine.world, [
@@ -239,7 +239,7 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
 
     if (displayHands.left.pose.length > 0) {
       p5.push();
-      p5.fill(220, displayHands.left.opacity);
+      p5.fill(200, displayHands.left.opacity);
       leftFingers.forEach((finger, index) => {
         finger.update(displayHands.left.pose);
         finger.show(p5);
@@ -249,7 +249,7 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
 
     if (displayHands.right.pose.length > 0) {
       p5.push();
-      p5.fill(220, displayHands.right.opacity);
+      p5.fill(200, displayHands.right.opacity);
       rightFingers.forEach((finger, index) => {
         finger.update(displayHands.right.pose);
         finger.show(p5);
