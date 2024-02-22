@@ -316,7 +316,7 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
 
     if (ballVisibilityRef.current && balls.length == 0) {
       //@ts-ignore
-      const newBall = new Ball({ x: window.innerWidth / 2, y: -1000 }, 80);
+      const newBall = new Ball({ x: window.innerWidth / 2, y: -1000 }, 60);
       Matter.Body.setDensity(newBall.body, 1);
       newBall.body.restitution = 0.15;
       balls.push(newBall);
@@ -340,9 +340,9 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
     for (const target of targets) {
       target.update(balls, score);
       if (target.state == "hit") {
-        Matter.Body.scale(balls[0].body, 0.6, 0.6);
-        balls[0].setMultiply(0.6);
-        balls[0].updateScale(0.6);
+        Matter.Body.scale(balls[0].body, 0.7, 0.7);
+        balls[0].setMultiply(0.7);
+        balls[0].updateScale(0.7);
         Tone.loaded().then(() => {
           player.start();
         });
