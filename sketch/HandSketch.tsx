@@ -369,8 +369,8 @@ export const HandSketch = ({ handpose, isLost }: Props) => {
         targets.push(
           new StaticTarget({
             position: {
-              x: window.innerWidth * (Math.random() * 0.8 + 0.1),
-              y: window.innerHeight * (Math.random() * 0.3 + 0.1),
+              x: window.innerWidth * (Math.random() * 0.7 + 0.15),
+              y: window.innerHeight * (Math.random() * 0.3 + 0.2),
             },
             size: 30,
           })
